@@ -7,7 +7,7 @@ const companyRouter = require('./routes/companyRoutes');
 const jobRouter = require('./routes/jobRoutes');
 
 // Auth
-const session = require('express-session');
+const session = require('cookie-session');
 const passport = require('passport');
 require('./config/passport-google');
 
@@ -19,14 +19,13 @@ app.set('trust proxy', 1);
 
 app.use(
 	session({
-		cookie: {
-			secure: true,
-			maxAge: 60000,
-		},
-		store: new RedisStore(),
 		secret: 'secret',
 		saveUninitialized: true,
 		resave: false,
+		maxAge: 1000 * 60 * 15,
+		cookie: {
+			secure: true,
+		},
 	})
 );
 
