@@ -1,4 +1,4 @@
-require('dotenv').config();
+// require('dotenv').config();
 // const { DynamoDB, GetItemCommand } = require('@aws-sdk/client-dynamodb');
 
 // // Set up AWS DynamoDB
@@ -61,7 +61,13 @@ const { DynamoDBDocumentClient } = require('@aws-sdk/lib-dynamodb');
 // Set the AWS Region.
 const REGION = 'us-east-2';
 // Create an Amazon DynamoDB service client object.
-const ddbClient = new DynamoDBClient({ region: REGION });
+const ddbClient = new DynamoDBClient({
+	region: REGION,
+	credentials: {
+		accessKeyId: process.env.aws_access_key_id,
+		secretAccessKey: process.env.aws_secret_access_key,
+	},
+});
 
 const marshallOptions = {
 	convertEmptyValues: true, // false, by default.
