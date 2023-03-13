@@ -1,4 +1,4 @@
-// require('dotenv').config();
+require('dotenv').config();
 // const { DynamoDB, GetItemCommand } = require('@aws-sdk/client-dynamodb');
 
 // // Set up AWS DynamoDB

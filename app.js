@@ -15,12 +15,18 @@ const app = express();
 
 app.use(cors());
 
+app.set('trust proxy', 1);
+
 app.use(
 	session({
-		secret: 'keyboard cat',
-		cookie: { maxAge: 60000 },
+		cookie: {
+			secure: true,
+			maxAge: 60000,
+		},
+		store: new RedisStore(),
+		secret: 'secret',
+		saveUninitialized: true,
 		resave: false,
-		saveUninitialized: false,
 	})
 );
 
