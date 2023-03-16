@@ -1,13 +1,13 @@
 const isAdmin = (req, res, next) => {
 	if (req.body.token && req.body.token === process.env.JWT_SECRET) {
-		next();
+		next()
 	} else {
 		res.json({
 			ok: false,
-			message: 'Unauthorized',
-		});
-		return;
+			message: 'Unauthorized'
+		})
+		return
 	}
-};
+}
 
-module.exports = isAdmin;
+module.exports = isAdmin

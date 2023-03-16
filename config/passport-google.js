@@ -1,8 +1,8 @@
-const { GetCommand, PutCommand } = require('@aws-sdk/lib-dynamodb');
-const ddbDocClient = require('../database/dynamo.js');
+const { GetCommand, PutCommand } = require('@aws-sdk/lib-dynamodb')
+const ddbDocClient = require('../database/dynamo.js')
 
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy
+const passport = require('passport')
 
 function repeat(profile) {
 	return {
@@ -12,8 +12,8 @@ function repeat(profile) {
 		photo: profile?.photos[0]?.value,
 		companiesApplied: [],
 		jobsApplied: [],
-		isAdmin: false,
-	};
+		isAdmin: false
+	}
 }
 
 // passport.use(
@@ -67,7 +67,7 @@ passport.use(
 			clientID: process.env.GOOGLE_CLIENT_ID,
 			clientSecret: process.env.GOOGLE_CLIENT_SECRET,
 			callbackURL: '/api/v1/auth/google/callback',
-			scope: ['email', 'profile'],
+			scope: ['email', 'profile']
 		},
 		async function passportCallback(
 			accessToken,
@@ -79,35 +79,33 @@ passport.use(
 				const params = {
 					TableName: 'users',
 					Key: {
-						id: profile.id,
-					},
-				};
-				const data = await ddbDocClient.send(new GetCommand(params));
-				// console.log('data when getting', data);
+						id: profile.id
+					}
+				}
+				const data = await ddbDocClient.send(new GetCommand(params))
+
 				if (data.Item) {
-					done(null, repeat(profile));
+					done(null, repeat(profile))
 				} else {
 					const params = {
 						TableName: 'users',
-						Item: repeat(profile),
-					};
-					// console.log(params);
-					const data = await ddbDocClient.send(new PutCommand(params));
-					// console.log('data when putting', data);
-					done(null, repeat(profile));
+						Item: repeat(profile)
+					}
+					const data = await ddbDocClient.send(new PutCommand(params))
+					done(null, repeat(profile))
 				}
 			} catch (err) {
-				console.log(err);
-				done(err, null);
+				console.log(err)
+				done(err, null)
 			}
 		}
 	)
-);
+)
 
 passport.serializeUser((user, done) => {
-	done(null, user);
-});
+	done(null, user)
+})
 
 passport.deserializeUser((user, done) => {
-	done(null, user);
-});
+	done(null, user)
+})
