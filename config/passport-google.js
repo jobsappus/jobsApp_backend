@@ -4,6 +4,8 @@ const ddbDocClient = require('../database/dynamo.js')
 const GoogleStrategy = require('passport-google-oauth20').Strategy
 const passport = require('passport')
 
+const TABLE_NAME = 'User'
+
 function repeat(profile) {
 	return {
 		id: profile.id,
@@ -77,7 +79,7 @@ passport.use(
 		) {
 			try {
 				const params = {
-					TableName: 'users',
+					TableName: TABLE_NAME,
 					Key: {
 						id: profile.id
 					}
@@ -88,7 +90,7 @@ passport.use(
 					done(null, repeat(profile))
 				} else {
 					const params = {
-						TableName: 'users',
+						TableName: TABLE_NAME,
 						Item: repeat(profile)
 					}
 					const data = await ddbDocClient.send(new PutCommand(params))

@@ -12,6 +12,7 @@ const s3 = new S3Client({
 		secretAccessKey: process.env.aws_secret_access_key
 	}
 })
+const BUCKET_NAME = 'company-logo.bucket'
 
 const {
 	GetCommand,
@@ -20,7 +21,7 @@ const {
 	ScanCommand
 } = require('@aws-sdk/lib-dynamodb')
 const ddbDocClient = require('../database/dynamo')
-const TABLE_NAME = 'Companies'
+const TABLE_NAME = 'Company'
 
 async function getAllCompanies(req, res, next) {
 	const params = {
@@ -60,7 +61,7 @@ async function createCompany(req, res, next) {
 
 		await uploadToS3(fileKey, compressedImage)
 		// save to dynamo
-		const imageUrl = `https://new-project-logo-storage.s3.us-east-2.amazonaws.com/${fileKey}`
+		const imageUrl = `https://${BUCKET_NAME}.s3.us-east-2.amazonaws.com/${fileKey}`
 		const dynamoCommand = new PutCommand({
 			TableName: TABLE_NAME,
 			Item: {
@@ -100,7 +101,7 @@ async function updateCompany(req, res, next) {
 
 		await uploadToS3(fileKey, compressedImage)
 		// Define the update expression and attribute values for the item
-		const logo = `https://new-project-logo-storage.s3.us-east-2.amazonaws.com/${fileKey}`
+		const logo = `https://${BUCKET_NAME}.s3.us-east-2.amazonaws.com/${fileKey}`
 
 		const updateExpression =
 			'SET #name = :nameValue, #logo = :logoValue, #h1b = :h1bValue'
@@ -133,7 +134,7 @@ async function updateCompany(req, res, next) {
 
 async function uploadToS3(fileKey, compressedImage) {
 	const putObjectCommand = new PutObjectCommand({
-		Bucket: 'new-project-logo-storage',
+		Bucket: BUCKET_NAME,
 		Key: fileKey,
 		Body: compressedImage,
 		ContentType: 'image/jpeg'
@@ -143,7 +144,7 @@ async function uploadToS3(fileKey, compressedImage) {
 
 async function deleteFromS3(key) {
 	const deleteCommand = new DeleteObjectCommand({
-		Bucket: 'new-project-logo-storage',
+		Bucket: BUCKET_NAME,
 		Key: key
 	})
 
