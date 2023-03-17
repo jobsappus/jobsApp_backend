@@ -3,59 +3,59 @@ const {
 	PutCommand,
 	DeleteCommand,
 	UpdateCommand,
-	ScanCommand
-} = require('@aws-sdk/lib-dynamodb')
-const ddbDocClient = require('../database/dynamo')
-const TABLE_NAME = 'Job'
+	ScanCommand,
+} = require('@aws-sdk/lib-dynamodb');
+const ddbDocClient = require('../database/dynamo');
+const TABLE_NAME = 'Job';
 
 const getAllJobs = async (req, res, next) => {
 	const params = {
-		TableName: TABLE_NAME
-	}
-	const { Items } = await ddbDocClient.send(new ScanCommand(params))
+		TableName: TABLE_NAME,
+	};
+	const { Items } = await ddbDocClient.send(new ScanCommand(params));
 	const ret = Items.map(async item => {
 		const params = {
-			TableName: 'Companies',
+			TableName: 'Company',
 			Key: {
-				companyId: item.companyId + ''
+				companyId: item.companyId + '',
 			},
 			scanFilter: {
-				Limit: 1
-			}
-		}
-		const I = await ddbDocClient.send(new GetCommand(params))
+				Limit: 1,
+			},
+		};
+		const I = await ddbDocClient.send(new GetCommand(params));
 
-		const retu = { ...item, company: I.Item }
+		const retu = { ...item, company: I.Item };
 		// console.log(retu);
-		return retu
-	})
+		return retu;
+	});
 	Promise.all(ret).then(values => {
-		res.status(200).json({ ok: true, data: values })
-	})
+		res.status(200).json({ ok: true, data: values });
+	});
 	//use "for async "
-}
+};
 
 const getJob = async (req, res, next) => {
 	try {
-		const { jobId } = req.params
+		const { jobId } = req.params;
 		const params = {
 			TableName: TABLE_NAME,
 			Key: {
-				jobId
-			}
-		}
-		const { Item } = await ddbDocClient.send(new GetCommand(params))
-		res.status(200).json({ ok: true, data: Item })
+				jobId,
+			},
+		};
+		const { Item } = await ddbDocClient.send(new GetCommand(params));
+		res.status(200).json({ ok: true, data: Item });
 	} catch (err) {
-		console.log(err)
-		res.status(200).json({ ok: false, message: err.message })
+		console.log(err);
+		res.status(200).json({ ok: false, message: err.message });
 	}
-}
+};
 
 const createJob = async (req, res, next) => {
 	const { companyId, jobTitle, jobLink, jobPostedDate, jobType, jobDesc } =
-		req.body
-	const date = Date.now() + ''
+		req.body;
+	const date = Date.now() + '';
 	// console.log(req.body)
 
 	try {
@@ -68,20 +68,20 @@ const createJob = async (req, res, next) => {
 				jobLink,
 				jobPostedDate,
 				jobType,
-				jobDesc
-			}
-		})
-		const dynamoResponse = await ddbDocClient.send(dynamoCommand)
-		res.status(201).json({ ok: true })
+				jobDesc,
+			},
+		});
+		const dynamoResponse = await ddbDocClient.send(dynamoCommand);
+		res.status(201).json({ ok: true });
 	} catch (err) {
-		res.status(404).json({ ok: false, message: err.message })
+		res.status(404).json({ ok: false, message: err.message });
 	}
-}
+};
 
 const updateJob = async (req, res, next) => {
-	const jobId = req.params.jobId.split(',')[0]
+	const jobId = req.params.jobId.split(',')[0];
 	const { companyId, jobTitle, jobLink, jobPostedDate, jobType, jobDesc } =
-		req.body
+		req.body;
 	try {
 		const updateCommand = new UpdateCommand({
 			TableName: TABLE_NAME,
@@ -94,7 +94,7 @@ const updateJob = async (req, res, next) => {
 				'#link': 'jobLink',
 				'#date': 'jobPostedDate',
 				'#type': 'jobType',
-				'#desc': 'jobDesc'
+				'#desc': 'jobDesc',
 			},
 			ExpressionAttributeValues: {
 				':companyValue': companyId,
@@ -102,30 +102,30 @@ const updateJob = async (req, res, next) => {
 				':linkValue': jobLink,
 				':dateValue': jobPostedDate,
 				':typeValue': jobType,
-				':descValue': jobDesc
-			}
-		})
-		const updated = await ddbDocClient.send(updateCommand)
-		res.status(200).json({ ok: true, data: updated })
+				':descValue': jobDesc,
+			},
+		});
+		const updated = await ddbDocClient.send(updateCommand);
+		res.status(200).json({ ok: true, data: updated });
 	} catch (err) {
-		res.status(404).json({ ok: false, message: err.message })
+		res.status(404).json({ ok: false, message: err.message });
 	}
-}
+};
 
 const deleteJob = async (req, res, next) => {
-	const jobId = req.params.jobId.split('_')[0]
+	const jobId = req.params.jobId.split('_')[0];
 	// console.log(jobId)
 	try {
 		const deleteCommand = new DeleteCommand({
 			TableName: TABLE_NAME,
-			Key: { jobId }
-		})
-		await ddbDocClient.send(deleteCommand)
-		res.status(200).json({ ok: true, message: 'Job deleted successfully' })
+			Key: { jobId },
+		});
+		await ddbDocClient.send(deleteCommand);
+		res.status(200).json({ ok: true, message: 'Job deleted successfully' });
 	} catch (err) {
-		console.log(err)
-		res.status(404).json({ ok: false, message: err.message })
+		console.log(err);
+		res.status(404).json({ ok: false, message: err.message });
 	}
-}
+};
 
-module.exports = { getAllJobs, createJob, getJob, updateJob, deleteJob }
+module.exports = { getAllJobs, createJob, getJob, updateJob, deleteJob };
