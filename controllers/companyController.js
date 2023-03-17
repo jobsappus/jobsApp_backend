@@ -52,7 +52,7 @@ async function createCompany(req, res, next) {
 	try {
 		const compressedImage = await sharp(req.file.buffer)
 			.resize({ width: 500, fit: 'inside', withoutEnlargement: true })
-			.jpeg({ quality: 70 })
+			.jpeg({ quality: 80 })
 			.toBuffer();
 
 		// upload to S3
@@ -94,7 +94,7 @@ async function updateCompany(req, res, next) {
 
 		const compressedImage = await sharp(req.file.buffer)
 			.resize({ width: 500, fit: 'inside', withoutEnlargement: true })
-			.jpeg({ quality: 70 })
+			.jpeg({ quality: 80 })
 			.toBuffer();
 
 		const date = Date.now();
